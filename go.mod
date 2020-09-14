@@ -1,4 +1,4 @@
-module badgerhold
+module badgerhold/v2
 
 go 1.15
 
