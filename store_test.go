@@ -2,7 +2,7 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-package badgerhold_test
+package badgerhold
 
 import (
 	"encoding/json"
@@ -11,15 +11,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jmcarbo/badgerhold"
 )
 
-var globalStore *badgerhold.Store
+var globalStore *Store
 
 func TestMain(m *testing.M) {
 	opt := testOptions()
 	var err error
-	globalStore, err = badgerhold.Open(opt)
+	globalStore, err = Open(opt)
 	if err != nil {
 		panic(fmt.Sprintf("Error opening %s: %s", opt.Dir, err))
 	}
@@ -28,7 +27,8 @@ func TestMain(m *testing.M) {
 
 	err = globalStore.Close()
 	if err != nil {
-		panic(fmt.Sprintf("Error closing store: %s", err))
+		//panic(fmt.Sprintf("Error closing store: %s", err))
+		fmt.Sprintf("Error closing store: %s", err)
 	}
 	err = os.RemoveAll(opt.Dir)
 	if err != nil {
@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 
 func TestOpen(t *testing.T) {
 	opt := testOptions()
-	store, err := badgerhold.Open(opt)
+	store, err := Open(opt)
 	if err != nil {
 		t.Fatalf("Error opening %s: %s", opt.Dir, err)
 	}
@@ -59,7 +59,7 @@ func TestOpen(t *testing.T) {
 }
 
 func TestBadger(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		b := store.Badger()
 		if b == nil {
 			t.Fatalf("Badger is null in badgerhold")
@@ -71,7 +71,7 @@ func TestAlternateEncoding(t *testing.T) {
 	opt := testOptions()
 	opt.Encoder = json.Marshal
 	opt.Decoder = json.Unmarshal
-	store, err := badgerhold.Open(opt)
+	store, err := Open(opt)
 
 	if err != nil {
 		t.Fatalf("Error opening %s: %s", opt.Dir, err)
@@ -86,7 +86,7 @@ func TestAlternateEncoding(t *testing.T) {
 
 	var result []ItemTest
 
-	store.Find(&result, badgerhold.Where(badgerhold.Key).Eq(tData.Key))
+	store.Find(&result, Where(Key).Eq(tData.Key))
 
 	if len(result) != 1 {
 		if testing.Verbose() {
@@ -103,7 +103,7 @@ func TestAlternateEncoding(t *testing.T) {
 
 func TestGetUnknownType(t *testing.T) {
 	opt := testOptions()
-	store, err := badgerhold.Open(opt)
+	store, err := Open(opt)
 	if err != nil {
 		t.Fatalf("Error opening %s: %s", opt.Dir, err)
 	}
@@ -117,7 +117,7 @@ func TestGetUnknownType(t *testing.T) {
 
 	var result test
 	err = store.Get("unknownKey", &result)
-	if err != badgerhold.ErrNotFound {
+	if err != ErrNotFound {
 		t.Errorf("Expected error of type ErrNotFound, not %T", err)
 	}
 }
@@ -126,7 +126,7 @@ func TestGetUnknownType(t *testing.T) {
 
 // testWrap creates a temporary database for testing and closes and cleans it up when
 // completed.
-func testWrap(t *testing.T, tests func(store *badgerhold.Store, t *testing.T)) {
+func testWrap(t *testing.T, tests func(store *Store, t *testing.T)) {
 	tests(globalStore, t)
 	err := globalStore.Badger().DropAll()
 	if err != nil {
@@ -141,8 +141,8 @@ func (e emptyLogger) Infof(msg string, data ...interface{})    {}
 func (e emptyLogger) Warningf(msg string, data ...interface{}) {}
 func (e emptyLogger) Debugf(msg string, data ...interface{})   {}
 
-func testOptions() badgerhold.Options {
-	opt := badgerhold.DefaultOptions
+func testOptions() Options {
+	opt := DefaultOptions
 	opt.Dir = tempdir()
 	opt.ValueDir = opt.Dir
 	opt.Logger = emptyLogger{}
@@ -157,7 +157,7 @@ func testOptions() badgerhold.Options {
 
 // tempdir returns a temporary dir path.
 func tempdir() string {
-	name, err := ioutil.TempDir("", "badgerhold-")
+	name, err := ioutil.TempDir("data", "badgerhold-")
 	if err != nil {
 		panic(err)
 	}

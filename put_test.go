@@ -2,7 +2,7 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-package badgerhold_test
+package badgerhold
 
 import (
 	"fmt"
@@ -10,11 +10,10 @@ import (
 	"time"
 
 	"github.com/dgraph-io/badger/v2"
-	"github.com/jmcarbo/badgerhold"
 )
 
 func TestInsert(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		key := "testKey"
 		data := &ItemTest{
 			Name:     "Test Name",
@@ -44,15 +43,15 @@ func TestInsert(t *testing.T) {
 			Created: time.Now(),
 		})
 
-		if err != badgerhold.ErrKeyExists {
-			t.Fatalf("Insert didn't fail! Expected %s got %s", badgerhold.ErrKeyExists, err)
+		if err != ErrKeyExists {
+			t.Fatalf("Insert didn't fail! Expected %s got %s", ErrKeyExists, err)
 		}
 
 	})
 }
 
 func TestInsertReadTxn(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		key := "testKey"
 		data := &ItemTest{
 			Name:     "Test Name",
@@ -72,7 +71,7 @@ func TestInsertReadTxn(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		key := "testKey"
 		data := &ItemTest{
 			Name:     "Test Name",
@@ -81,8 +80,8 @@ func TestUpdate(t *testing.T) {
 		}
 
 		err := store.Update(key, data)
-		if err != badgerhold.ErrNotFound {
-			t.Fatalf("Update without insert didn't fail! Expected %s got %s", badgerhold.ErrNotFound, err)
+		if err != ErrNotFound {
+			t.Fatalf("Update without insert didn't fail! Expected %s got %s", ErrNotFound, err)
 		}
 
 		err = store.Insert(key, data)
@@ -127,7 +126,7 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestUpdateReadTxn(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		key := "testKey"
 		data := &ItemTest{
 			Name:     "Test Name",
@@ -147,7 +146,7 @@ func TestUpdateReadTxn(t *testing.T) {
 }
 
 func TestUpsert(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		key := "testKey"
 		data := &ItemTest{
 			Name:     "Test Name",
@@ -196,7 +195,7 @@ func TestUpsert(t *testing.T) {
 }
 
 func TestUpsertReadTxn(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		key := "testKey"
 		data := &ItemTest{
 			Name:     "Test Name",
@@ -218,7 +217,7 @@ func TestUpsertReadTxn(t *testing.T) {
 func TestUpdateMatching(t *testing.T) {
 	for _, tst := range testResults {
 		t.Run(tst.name, func(t *testing.T) {
-			testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+			testWrap(t, func(store *Store, t *testing.T) {
 
 				insertTestData(t, store)
 
@@ -240,7 +239,7 @@ func TestUpdateMatching(t *testing.T) {
 				}
 
 				var result []ItemTest
-				err = store.Find(&result, badgerhold.Where("UpdateIndex").Eq("updated index").
+				err = store.Find(&result, Where("UpdateIndex").Eq("updated index").
 					And("UpdateField").Eq("updated"))
 				if err != nil {
 					t.Fatalf("Error finding result after update from badgerhold: %s", err)
@@ -282,7 +281,7 @@ func TestUpdateMatching(t *testing.T) {
 }
 
 func TestIssue14(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		key := "testKey"
 		data := &ItemTest{
 			Name:     "Test Name",
@@ -308,7 +307,7 @@ func TestIssue14(t *testing.T) {
 
 		var result []ItemTest
 		// try to find the record on the old index value
-		err = store.Find(&result, badgerhold.Where("Category").Eq("Test Category"))
+		err = store.Find(&result, Where("Category").Eq("Test Category"))
 		if err != nil {
 			t.Fatalf("Error retrieving query result for TestIssue14: %s", err)
 		}
@@ -321,7 +320,7 @@ func TestIssue14(t *testing.T) {
 }
 
 func TestIssue14Upsert(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		key := "testKey"
 		data := &ItemTest{
 			Name:     "Test Name",
@@ -347,7 +346,7 @@ func TestIssue14Upsert(t *testing.T) {
 
 		var result []ItemTest
 		// try to find the record on the old index value
-		err = store.Find(&result, badgerhold.Where("Category").Eq("Test Category"))
+		err = store.Find(&result, Where("Category").Eq("Test Category"))
 		if err != nil {
 			t.Fatalf("Error retrieving query result for TestIssue14: %s", err)
 		}
@@ -360,7 +359,7 @@ func TestIssue14Upsert(t *testing.T) {
 }
 
 func TestIssue14UpdateMatching(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		key := "testKey"
 		data := &ItemTest{
 			Name:     "Test Name",
@@ -372,7 +371,7 @@ func TestIssue14UpdateMatching(t *testing.T) {
 			t.Fatalf("Error creating data for update test: %s", err)
 		}
 
-		err = store.UpdateMatching(&ItemTest{}, badgerhold.Where("Name").Eq("Test Name"),
+		err = store.UpdateMatching(&ItemTest{}, Where("Name").Eq("Test Name"),
 			func(record interface{}) error {
 				update, ok := record.(*ItemTest)
 				if !ok {
@@ -390,7 +389,7 @@ func TestIssue14UpdateMatching(t *testing.T) {
 
 		var result []ItemTest
 		// try to find the record on the old index value
-		err = store.Find(&result, badgerhold.Where("Category").Eq("Test Category"))
+		err = store.Find(&result, Where("Category").Eq("Test Category"))
 		if err != nil {
 			t.Fatalf("Error retrieving query result for TestIssue14: %s", err)
 		}
@@ -403,14 +402,14 @@ func TestIssue14UpdateMatching(t *testing.T) {
 }
 
 func TestInsertSequence(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 
 		type SequenceTest struct {
 			Key uint64 `badgerholdKey:"Key"`
 		}
 
 		for i := 0; i < 10; i++ {
-			err := store.Insert(badgerhold.NextSequence(), &SequenceTest{})
+			err := store.Insert(NextSequence(), &SequenceTest{})
 			if err != nil {
 				t.Fatalf("Error inserting data for sequence test: %s", err)
 			}
@@ -433,12 +432,12 @@ func TestInsertSequence(t *testing.T) {
 }
 
 func TestInsertSequenceSetKey(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 
 		// Properly tagged, passed by reference, and the field is the same type
 		// as bucket.NextSequence() produces
 		type InsertSequenceSetKeyTest struct {
-			// badgerhold.NextSequence() creates an auto-key that is a uint64
+			// NextSequence() creates an auto-key that is a uint64
 			Key uint64 `badgerholdKey:"Key"`
 		}
 
@@ -447,7 +446,7 @@ func TestInsertSequenceSetKey(t *testing.T) {
 			if st.Key != 0 {
 				t.Fatalf("Zero value of test data should be 0")
 			}
-			err := store.Insert(badgerhold.NextSequence(), &st)
+			err := store.Insert(NextSequence(), &st)
 			if err != nil {
 				t.Fatalf("Error inserting data for sequence test: %s", err)
 			}
@@ -460,7 +459,7 @@ func TestInsertSequenceSetKey(t *testing.T) {
 }
 
 func TestInsertSetKey(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 
 		type TestInsertSetKey struct {
 			Key uint `badgerholdKey:"Key"`
@@ -521,7 +520,7 @@ func TestInsertSetKey(t *testing.T) {
 }
 
 func TestAlternateTags(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		type TestAlternate struct {
 			Key  uint64 `badgerhold:"key"`
 			Name string `badgerhold:"index"`
@@ -542,7 +541,7 @@ func TestAlternateTags(t *testing.T) {
 
 		var result []TestAlternate
 
-		err = store.Find(&result, badgerhold.Where("Name").Eq(item.Name).Index("Name"))
+		err = store.Find(&result, Where("Name").Eq(item.Name).Index("Name"))
 		if err != nil {
 			t.Fatalf("Query on alternate tag index failed: %s", err)
 		}
@@ -554,7 +553,7 @@ func TestAlternateTags(t *testing.T) {
 }
 
 func TestUniqueConstraint(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		type TestUnique struct {
 			Key  uint64 `badgerhold:"key"`
 			Name string `badgerhold:"unique"`
@@ -564,16 +563,16 @@ func TestUniqueConstraint(t *testing.T) {
 			Name: "Tester Name",
 		}
 
-		err := store.Insert(badgerhold.NextSequence(), item)
+		err := store.Insert(NextSequence(), item)
 		if err != nil {
 			t.Fatalf("Error inserting base record for unique testing: %s", err)
 		}
 
 		t.Run("Insert", func(t *testing.T) {
-			err = store.Insert(badgerhold.NextSequence(), item)
-			if err != badgerhold.ErrUniqueExists {
+			err = store.Insert(NextSequence(), item)
+			if err != ErrUniqueExists {
 				t.Fatalf("Inserting duplicate record did not result in a unique constraint error: "+
-					"Expected %s, Got %s", badgerhold.ErrUniqueExists, err)
+					"Expected %s, Got %s", ErrUniqueExists, err)
 			}
 		})
 
@@ -581,7 +580,7 @@ func TestUniqueConstraint(t *testing.T) {
 			update := &TestUnique{
 				Name: "Update Name",
 			}
-			err = store.Insert(badgerhold.NextSequence(), update)
+			err = store.Insert(NextSequence(), update)
 
 			if err != nil {
 				t.Fatalf("Inserting record for update Unique testing failed: %s", err)
@@ -589,9 +588,9 @@ func TestUniqueConstraint(t *testing.T) {
 			update.Name = item.Name
 
 			err = store.Update(update.Key, update)
-			if err != badgerhold.ErrUniqueExists {
+			if err != ErrUniqueExists {
 				t.Fatalf("Duplicate record did not result in a unique constraint error: "+
-					"Expected %s, Got %s", badgerhold.ErrUniqueExists, err)
+					"Expected %s, Got %s", ErrUniqueExists, err)
 			}
 		})
 
@@ -599,7 +598,7 @@ func TestUniqueConstraint(t *testing.T) {
 			update := &TestUnique{
 				Name: "Upsert Name",
 			}
-			err = store.Insert(badgerhold.NextSequence(), update)
+			err = store.Insert(NextSequence(), update)
 
 			if err != nil {
 				t.Fatalf("Inserting record for upsert Unique testing failed: %s", err)
@@ -608,9 +607,9 @@ func TestUniqueConstraint(t *testing.T) {
 			update.Name = item.Name
 
 			err = store.Upsert(update.Key, update)
-			if err != badgerhold.ErrUniqueExists {
+			if err != ErrUniqueExists {
 				t.Fatalf("Duplicate record did not result in a unique constraint error: "+
-					"Expected %s, Got %s", badgerhold.ErrUniqueExists, err)
+					"Expected %s, Got %s", ErrUniqueExists, err)
 			}
 		})
 
@@ -618,13 +617,13 @@ func TestUniqueConstraint(t *testing.T) {
 			update := &TestUnique{
 				Name: "UpdateMatching Name",
 			}
-			err = store.Insert(badgerhold.NextSequence(), update)
+			err = store.Insert(NextSequence(), update)
 
 			if err != nil {
 				t.Fatalf("Inserting record for updatematching Unique testing failed: %s", err)
 			}
 
-			err = store.UpdateMatching(TestUnique{}, badgerhold.Where(badgerhold.Key).Eq(update.Key),
+			err = store.UpdateMatching(TestUnique{}, Where(Key).Eq(update.Key),
 				func(r interface{}) error {
 					record, ok := r.(*TestUnique)
 					if !ok {
@@ -636,9 +635,9 @@ func TestUniqueConstraint(t *testing.T) {
 
 					return nil
 				})
-			if err != badgerhold.ErrUniqueExists {
+			if err != ErrUniqueExists {
 				t.Fatalf("Duplicate record did not result in a unique constraint error: "+
-					"Expected %s, Got %s", badgerhold.ErrUniqueExists, err)
+					"Expected %s, Got %s", ErrUniqueExists, err)
 			}
 
 		})
@@ -649,7 +648,7 @@ func TestUniqueConstraint(t *testing.T) {
 				t.Fatalf("Error deleting record for unique testing %s", err)
 			}
 
-			err = store.Insert(badgerhold.NextSequence(), item)
+			err = store.Insert(NextSequence(), item)
 			if err != nil {
 				t.Fatalf("Error inserting duplicate record that has been previously removed: %s", err)
 			}

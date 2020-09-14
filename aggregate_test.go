@@ -2,17 +2,15 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-package badgerhold_test
+package badgerhold
 
 import (
 	"fmt"
 	"testing"
-
-	"github.com/jmcarbo/badgerhold"
 )
 
 func TestFindAggregateGroup(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 
 		result, err := store.FindAggregate(&ItemTest{}, nil, "Category")
@@ -123,7 +121,7 @@ func TestFindAggregateGroup(t *testing.T) {
 }
 
 func TestFindAggregateMultipleGrouping(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 
 		result, err := store.FindAggregate(&ItemTest{}, nil, "Category", "Color")
@@ -312,7 +310,7 @@ func TestFindAggregateMultipleGrouping(t *testing.T) {
 }
 
 func TestFindAggregateGroupPointerPanic(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		defer func() {
 			if r := recover(); r == nil {
@@ -329,7 +327,7 @@ func TestFindAggregateGroupPointerPanic(t *testing.T) {
 }
 
 func TestFindAggregateGroupLenPanic(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		defer func() {
 			if r := recover(); r == nil {
@@ -347,7 +345,7 @@ func TestFindAggregateGroupLenPanic(t *testing.T) {
 }
 
 func TestFindAggregateReductionPointerPanic(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		defer func() {
 			if r := recover(); r == nil {
@@ -364,7 +362,7 @@ func TestFindAggregateReductionPointerPanic(t *testing.T) {
 }
 
 func TestFindAggregateSortInvalidFieldPanic(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		defer func() {
 			if r := recover(); r == nil {
@@ -379,7 +377,7 @@ func TestFindAggregateSortInvalidFieldPanic(t *testing.T) {
 }
 
 func TestFindAggregateSortLowerFieldPanic(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		defer func() {
 			if r := recover(); r == nil {
@@ -394,7 +392,7 @@ func TestFindAggregateSortLowerFieldPanic(t *testing.T) {
 }
 
 func TestFindAggregateMaxPointerPanic(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		defer func() {
 			if r := recover(); r == nil {
@@ -411,7 +409,7 @@ func TestFindAggregateMaxPointerPanic(t *testing.T) {
 }
 
 func TestFindAggregateMaxPointerNilPanic(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		defer func() {
 			if r := recover(); r == nil {
@@ -428,7 +426,7 @@ func TestFindAggregateMaxPointerNilPanic(t *testing.T) {
 }
 
 func TestFindAggregateMinPointerPanic(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		defer func() {
 			if r := recover(); r == nil {
@@ -445,7 +443,7 @@ func TestFindAggregateMinPointerPanic(t *testing.T) {
 }
 
 func TestFindAggregateMinPointerNilPanic(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		defer func() {
 			if r := recover(); r == nil {
@@ -462,7 +460,7 @@ func TestFindAggregateMinPointerNilPanic(t *testing.T) {
 }
 
 func TestFindAggregateBadSumFieldPanic(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		defer func() {
 			if r := recover(); r == nil {
@@ -477,7 +475,7 @@ func TestFindAggregateBadSumFieldPanic(t *testing.T) {
 }
 
 func TestFindAggregateBadGroupField(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 
 		_, err := store.FindAggregate(&ItemTest{}, nil, "BadField")
@@ -489,10 +487,10 @@ func TestFindAggregateBadGroupField(t *testing.T) {
 }
 
 func TestFindAggregateWithNoResult(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 
-		result, err := store.FindAggregate(&ItemTest{}, badgerhold.Where("Name").
+		result, err := store.FindAggregate(&ItemTest{}, Where("Name").
 			Eq("Never going to match on this"), "Category")
 		if err != nil {
 			t.Fatalf("FindAggregate failed when the query produced no results")
@@ -506,7 +504,7 @@ func TestFindAggregateWithNoResult(t *testing.T) {
 }
 
 func TestFindAggregateWithNoGroupBy(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 
 		result, err := store.FindAggregate(&ItemTest{}, nil)

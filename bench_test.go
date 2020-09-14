@@ -2,7 +2,7 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-package badgerhold_test
+package badgerhold
 
 import (
 	"encoding/binary"
@@ -12,7 +12,6 @@ import (
 	"testing"
 
 	"github.com/dgraph-io/badger/v2"
-	"github.com/jmcarbo/badgerhold"
 )
 
 type BenchData struct {
@@ -37,7 +36,7 @@ var benchItemIndexed = BenchData{
 
 // benchWrap creates a temporary database for testing and closes and cleans it up when
 // completed.
-func benchWrap(b *testing.B, options *badgerhold.Options, bench func(store *badgerhold.Store, b *testing.B)) {
+func benchWrap(b *testing.B, options *Options, bench func(store *Store, b *testing.B)) {
 	tempDir, err := ioutil.TempDir("", "badgerhold_tests")
 	if err != nil {
 		b.Fatalf("Error opening %s: %s", tempDir, err)
@@ -45,13 +44,13 @@ func benchWrap(b *testing.B, options *badgerhold.Options, bench func(store *badg
 	defer os.RemoveAll(tempDir)
 
 	if options == nil {
-		options = &badgerhold.DefaultOptions
+		options = &DefaultOptions
 	}
 
 	options.Dir = tempDir
 	options.ValueDir = tempDir
 
-	store, err := badgerhold.Open(*options)
+	store, err := Open(*options)
 	if err != nil {
 		b.Fatalf("Error opening %s: %s", tempDir, err)
 	}
@@ -74,12 +73,12 @@ func id() []byte {
 }
 
 func BenchmarkRawInsert(b *testing.B) {
-	data, err := badgerhold.DefaultEncode(benchItem)
+	data, err := DefaultEncode(benchItem)
 	if err != nil {
 		b.Fatalf("Error encoding data for raw benchmarking: %s", err)
 	}
 
-	benchWrap(b, nil, func(store *badgerhold.Store, b *testing.B) {
+	benchWrap(b, nil, func(store *Store, b *testing.B) {
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
@@ -95,7 +94,7 @@ func BenchmarkRawInsert(b *testing.B) {
 }
 
 func BenchmarkNoIndexInsert(b *testing.B) {
-	benchWrap(b, nil, func(store *badgerhold.Store, b *testing.B) {
+	benchWrap(b, nil, func(store *Store, b *testing.B) {
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
@@ -108,7 +107,7 @@ func BenchmarkNoIndexInsert(b *testing.B) {
 }
 
 func BenchmarkIndexedInsert(b *testing.B) {
-	benchWrap(b, nil, func(store *badgerhold.Store, b *testing.B) {
+	benchWrap(b, nil, func(store *Store, b *testing.B) {
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
@@ -121,7 +120,7 @@ func BenchmarkIndexedInsert(b *testing.B) {
 }
 
 func BenchmarkNoIndexUpsert(b *testing.B) {
-	benchWrap(b, nil, func(store *badgerhold.Store, b *testing.B) {
+	benchWrap(b, nil, func(store *Store, b *testing.B) {
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
@@ -134,7 +133,7 @@ func BenchmarkNoIndexUpsert(b *testing.B) {
 }
 
 func BenchmarkIndexedUpsert(b *testing.B) {
-	benchWrap(b, nil, func(store *badgerhold.Store, b *testing.B) {
+	benchWrap(b, nil, func(store *Store, b *testing.B) {
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
@@ -147,10 +146,10 @@ func BenchmarkIndexedUpsert(b *testing.B) {
 }
 
 func BenchmarkNoIndexInsertJSON(b *testing.B) {
-	opt := badgerhold.DefaultOptions
+	opt := DefaultOptions
 	opt.Encoder = json.Marshal
 	opt.Decoder = json.Unmarshal
-	benchWrap(b, &opt, func(store *badgerhold.Store, b *testing.B) {
+	benchWrap(b, &opt, func(store *Store, b *testing.B) {
 		b.ResetTimer()
 
 		for i := 0; i < b.N; i++ {
@@ -163,7 +162,7 @@ func BenchmarkNoIndexInsertJSON(b *testing.B) {
 }
 
 func BenchmarkFindNoIndex(b *testing.B) {
-	benchWrap(b, nil, func(store *badgerhold.Store, b *testing.B) {
+	benchWrap(b, nil, func(store *Store, b *testing.B) {
 		for i := 0; i < 3; i++ {
 			for k := 0; k < 100; k++ {
 				err := store.Insert(id(), benchItem)
@@ -186,7 +185,7 @@ func BenchmarkFindNoIndex(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			var result []BenchData
 
-			err := store.Find(&result, badgerhold.Where("Category").Eq("findCategory"))
+			err := store.Find(&result, Where("Category").Eq("findCategory"))
 			if err != nil {
 				b.Fatalf("Error finding data in store: %s", err)
 			}
@@ -195,7 +194,7 @@ func BenchmarkFindNoIndex(b *testing.B) {
 }
 
 func BenchmarkFindIndexed(b *testing.B) {
-	benchWrap(b, nil, func(store *badgerhold.Store, b *testing.B) {
+	benchWrap(b, nil, func(store *Store, b *testing.B) {
 		for i := 0; i < 3; i++ {
 			for k := 0; k < 100; k++ {
 				err := store.Insert(id(), benchItemIndexed)
@@ -218,7 +217,7 @@ func BenchmarkFindIndexed(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			var result []BenchDataIndexed
 
-			err := store.Find(&result, badgerhold.Where("Category").Eq("findCategory"))
+			err := store.Find(&result, Where("Category").Eq("findCategory"))
 			if err != nil {
 				b.Fatalf("Error finding data in store: %s", err)
 			}

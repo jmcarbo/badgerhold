@@ -2,13 +2,12 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-package badgerhold_test
+package badgerhold
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/jmcarbo/badgerhold"
 )
 
 type Nested struct {
@@ -126,43 +125,43 @@ var nestedData = []Nested{
 var nestedTests = []test{
 	{
 		name:   "Nested",
-		query:  badgerhold.Where("L1.Name").Eq("Joe"),
+		query:  Where("L1.Name").Eq("Joe"),
 		result: []int{0},
 	},
 	{
 		name:   "Embedded",
-		query:  badgerhold.Where("Color").Eq("red"),
+		query:  Where("Color").Eq("red"),
 		result: []int{0, 1},
 	},
 	{
 		name:   "Embedded Explicit",
-		query:  badgerhold.Where("Embed.Color").Eq("red"),
+		query:  Where("Embed.Color").Eq("red"),
 		result: []int{0, 1},
 	},
 	{
 		name:   "Nested Multiple Levels",
-		query:  badgerhold.Where("L2.L3.Name").Eq("Joe"),
+		query:  Where("L2.L3.Name").Eq("Joe"),
 		result: []int{0, 3},
 	},
 	{
 		name:   "Pointer",
-		query:  badgerhold.Where("Pointer.Name").Eq("Jill"),
+		query:  Where("Pointer.Name").Eq("Jill"),
 		result: []int{1, 2, 3},
 	},
 	{
 		name:   "Sort",
-		query:  badgerhold.Where("Key").Ge(0).SortBy("L2.L3.Name"),
+		query:  Where("Key").Ge(0).SortBy("L2.L3.Name"),
 		result: []int{4, 1, 2, 0, 3},
 	},
 	{
 		name:   "Sort On Pointer",
-		query:  badgerhold.Where("Key").Ge(0).SortBy("Pointer.Name"),
+		query:  Where("Key").Ge(0).SortBy("Pointer.Name"),
 		result: []int{4, 1, 2, 0, 3},
 	},
 }
 
 func TestNested(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		for i := range nestedData {
 			err := store.Insert(nestedData[i].Key, nestedData[i])
 			if err != nil {

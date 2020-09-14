@@ -2,80 +2,79 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-package badgerhold_test
+package badgerhold
 
 import (
 	"fmt"
 	"testing"
 
-	"github.com/jmcarbo/badgerhold"
 )
 
 var sortTests = []test{
 	{
 		name:   "Sort By Name",
-		query:  badgerhold.Where("Category").Eq("animal").SortBy("Name"),
+		query:  Where("Category").Eq("animal").SortBy("Name"),
 		result: []int{9, 5, 14, 8, 13, 2, 16},
 	},
 	{
 		name:   "Sort By Name Reversed",
-		query:  badgerhold.Where("Category").Eq("animal").SortBy("Name").Reverse(),
+		query:  Where("Category").Eq("animal").SortBy("Name").Reverse(),
 		result: []int{16, 2, 13, 8, 14, 5, 9},
 	},
 	{
 		name:   "Sort By Multiple Fields",
-		query:  badgerhold.Where("ID").In(8, 3, 13).SortBy("Category", "Name"),
+		query:  Where("ID").In(8, 3, 13).SortBy("Category", "Name"),
 		result: []int{13, 15, 4, 3},
 	},
 	{
 		name:   "Sort By Multiple Fields Reversed",
-		query:  badgerhold.Where("ID").In(8, 3, 13).SortBy("Category", "Name").Reverse(),
+		query:  Where("ID").In(8, 3, 13).SortBy("Category", "Name").Reverse(),
 		result: []int{3, 4, 15, 13},
 	},
 	{
 		name:   "Sort By Duplicate Field Names",
-		query:  badgerhold.Where("ID").In(8, 3, 13).SortBy("Category", "Name", "Category"),
+		query:  Where("ID").In(8, 3, 13).SortBy("Category", "Name", "Category"),
 		result: []int{13, 15, 4, 3},
 	},
 	{
 		name:   "Sort By Name with limit",
-		query:  badgerhold.Where("Category").Eq("animal").SortBy("Name").Limit(3),
+		query:  Where("Category").Eq("animal").SortBy("Name").Limit(3),
 		result: []int{9, 5, 14},
 	},
 	{
 		name:   "Sort By Name with skip",
-		query:  badgerhold.Where("Category").Eq("animal").SortBy("Name").Skip(3),
+		query:  Where("Category").Eq("animal").SortBy("Name").Skip(3),
 		result: []int{8, 13, 2, 16},
 	},
 	{
 		name:   "Sort By Name with skip and limit",
-		query:  badgerhold.Where("Category").Eq("animal").SortBy("Name").Skip(2).Limit(3),
+		query:  Where("Category").Eq("animal").SortBy("Name").Skip(2).Limit(3),
 		result: []int{14, 8, 13},
 	},
 	{
 		name:   "Sort By Name Reversed with limit",
-		query:  badgerhold.Where("Category").Eq("animal").SortBy("Name").Skip(2).Limit(3),
+		query:  Where("Category").Eq("animal").SortBy("Name").Skip(2).Limit(3),
 		result: []int{14, 8, 13},
 	},
 	{
 		name:   "Sort By Name Reversed with skip",
-		query:  badgerhold.Where("Category").Eq("animal").SortBy("Name").Skip(4),
+		query:  Where("Category").Eq("animal").SortBy("Name").Skip(4),
 		result: []int{13, 2, 16},
 	},
 	{
 		name:   "Sort By Name Reversed with skip and limit",
-		query:  badgerhold.Where("Category").Eq("animal").SortBy("Name").Skip(2).Limit(3),
+		query:  Where("Category").Eq("animal").SortBy("Name").Skip(2).Limit(3),
 		result: []int{14, 8, 13},
 	},
 	{
 		name:   "Sort By Name with skip greater than length",
-		query:  badgerhold.Where("Category").Eq("animal").SortBy("Name").Skip(10),
+		query:  Where("Category").Eq("animal").SortBy("Name").Skip(10),
 		result: []int{},
 	},
 }
 
 func TestSortedFind(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 
 		for _, tst := range sortTests {
@@ -110,7 +109,7 @@ func TestSortedFind(t *testing.T) {
 func TestSortedUpdateMatching(t *testing.T) {
 	for _, tst := range sortTests {
 		t.Run(tst.name, func(t *testing.T) {
-			testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+			testWrap(t, func(store *Store, t *testing.T) {
 
 				insertTestData(t, store)
 
@@ -131,7 +130,7 @@ func TestSortedUpdateMatching(t *testing.T) {
 				}
 
 				var result []ItemTest
-				err = store.Find(&result, badgerhold.Where("UpdateIndex").Eq("updated index").And("UpdateField").Eq("updated"))
+				err = store.Find(&result, Where("UpdateIndex").Eq("updated index").And("UpdateField").Eq("updated"))
 				if err != nil {
 					t.Fatalf("Error finding result after update from badgerhold: %s", err)
 				}
@@ -174,7 +173,7 @@ func TestSortedUpdateMatching(t *testing.T) {
 func TestSortedDeleteMatching(t *testing.T) {
 	for _, tst := range sortTests {
 		t.Run(tst.name, func(t *testing.T) {
-			testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+			testWrap(t, func(store *Store, t *testing.T) {
 
 				insertTestData(t, store)
 
@@ -223,7 +222,7 @@ func TestSortedDeleteMatching(t *testing.T) {
 }
 
 func TestSortOnKey(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Fatalf("Running Sort on Key field did not panic!")
@@ -231,16 +230,16 @@ func TestSortOnKey(t *testing.T) {
 		}()
 
 		var result []ItemTest
-		_ = store.Find(&result, badgerhold.Where("Name").Eq("blah").SortBy(badgerhold.Key))
+		_ = store.Find(&result, Where("Name").Eq("blah").SortBy(Key))
 	})
 }
 
 func TestSortedFindOnInvalidFieldName(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		var result []ItemTest
 
-		err := store.Find(&result, badgerhold.Where("BadFieldName").Eq("test").SortBy("BadFieldName"))
+		err := store.Find(&result, Where("BadFieldName").Eq("test").SortBy("BadFieldName"))
 		if err == nil {
 			t.Fatalf("Sorted find query against a bad field name didn't return an error!")
 		}
@@ -249,13 +248,13 @@ func TestSortedFindOnInvalidFieldName(t *testing.T) {
 }
 
 func TestSortedFindWithNonSlicePtr(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Fatalf("Running Find with non-slice pointer did not panic!")
 			}
 		}()
 		var result []ItemTest
-		_ = store.Find(result, badgerhold.Where("Name").Eq("blah").SortBy("Name"))
+		_ = store.Find(result, Where("Name").Eq("blah").SortBy("Name"))
 	})
 }

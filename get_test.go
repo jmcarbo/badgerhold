@@ -2,17 +2,16 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-package badgerhold_test
+package badgerhold
 
 import (
 	"testing"
 	"time"
 
-	"github.com/jmcarbo/badgerhold"
 )
 
 func TestGet(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		key := "testKey"
 		data := &ItemTest{
 			Name:    "Test Name",

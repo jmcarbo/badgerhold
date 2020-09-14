@@ -2,7 +2,7 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-package badgerhold_test
+package badgerhold
 
 import (
 	"fmt"
@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jmcarbo/badgerhold"
 )
 
 type ItemTest struct {
@@ -182,124 +181,124 @@ var testData = []ItemTest{
 
 type test struct {
 	name   string
-	query  *badgerhold.Query
+	query  *Query
 	result []int // indices of test data to be found
 }
 
 var testResults = []test{
 	{
 		name:   "Equal Key",
-		query:  badgerhold.Where(badgerhold.Key).Eq(testData[4].Key),
+		query:  Where(Key).Eq(testData[4].Key),
 		result: []int{4},
 	},
 	{
 		name:   "Equal Field Without Index",
-		query:  badgerhold.Where("Name").Eq(testData[1].Name),
+		query:  Where("Name").Eq(testData[1].Name),
 		result: []int{1},
 	},
 	{
 		name:   "Equal Field With Index",
-		query:  badgerhold.Where("Category").Eq("vehicle"),
+		query:  Where("Category").Eq("vehicle"),
 		result: []int{0, 1, 3, 6, 11},
 	},
 	{
 		name:   "Not Equal Key",
-		query:  badgerhold.Where(badgerhold.Key).Ne(testData[4].Key),
+		query:  Where(Key).Ne(testData[4].Key),
 		result: []int{0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16},
 	},
 	{
 		name:   "Not Equal Field Without Index",
-		query:  badgerhold.Where("Name").Ne(testData[1].Name),
+		query:  Where("Name").Ne(testData[1].Name),
 		result: []int{0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16},
 	},
 	{
 		name:   "Not Equal Field With Index",
-		query:  badgerhold.Where("Category").Ne("vehicle"),
+		query:  Where("Category").Ne("vehicle"),
 		result: []int{2, 4, 5, 7, 8, 9, 10, 12, 13, 14, 15, 16},
 	},
 	{
 		name:   "Greater Than Key",
-		query:  badgerhold.Where(badgerhold.Key).Gt(testData[10].Key),
+		query:  Where(Key).Gt(testData[10].Key),
 		result: []int{11, 12, 13, 14, 15, 16},
 	},
 	{
 		name:   "Greater Than Field Without Index",
-		query:  badgerhold.Where("ID").Gt(10),
+		query:  Where("ID").Gt(10),
 		result: []int{12, 14, 15},
 	},
 	{
 		name:   "Greater Than Field With Index",
-		query:  badgerhold.Where("Category").Gt("food"),
+		query:  Where("Category").Gt("food"),
 		result: []int{0, 1, 3, 6, 11},
 	},
 	{
 		name:   "Less Than Key",
-		query:  badgerhold.Where(badgerhold.Key).Lt(testData[0].Key),
+		query:  Where(Key).Lt(testData[0].Key),
 		result: []int{},
 	},
 	{
 		name:   "Less Than Field Without Index",
-		query:  badgerhold.Where("ID").Lt(5),
+		query:  Where("ID").Lt(5),
 		result: []int{0, 1, 2, 3, 5},
 	},
 	{
 		name:   "Less Than Field With Index",
-		query:  badgerhold.Where("Category").Lt("food"),
+		query:  Where("Category").Lt("food"),
 		result: []int{2, 5, 8, 9, 13, 14, 16},
 	},
 	{
 		name:   "Less Than or Equal To Key",
-		query:  badgerhold.Where(badgerhold.Key).Le(testData[0].Key),
+		query:  Where(Key).Le(testData[0].Key),
 		result: []int{0},
 	},
 	{
 		name:   "Less Than or Equal To Field Without Index",
-		query:  badgerhold.Where("ID").Le(5),
+		query:  Where("ID").Le(5),
 		result: []int{0, 1, 2, 3, 5, 6, 7},
 	},
 	{
 		name:   "Less Than Field With Index",
-		query:  badgerhold.Where("Category").Le("food"),
+		query:  Where("Category").Le("food"),
 		result: []int{2, 5, 8, 9, 13, 14, 16, 4, 7, 10, 12, 15},
 	},
 	{
 		name:   "Greater Than or Equal To Key",
-		query:  badgerhold.Where(badgerhold.Key).Ge(testData[10].Key),
+		query:  Where(Key).Ge(testData[10].Key),
 		result: []int{10, 11, 12, 13, 14, 15, 16},
 	},
 	{
 		name:   "Greater Than or Equal To Field Without Index",
-		query:  badgerhold.Where("ID").Ge(10),
+		query:  Where("ID").Ge(10),
 		result: []int{12, 14, 15, 11},
 	},
 	{
 		name:   "Greater Than or Equal To Field With Index",
-		query:  badgerhold.Where("Category").Ge("food"),
+		query:  Where("Category").Ge("food"),
 		result: []int{0, 1, 3, 6, 11, 4, 7, 10, 12, 15},
 	},
 	{
 		name:   "In",
-		query:  badgerhold.Where("ID").In(5, 8, 3),
+		query:  Where("ID").In(5, 8, 3),
 		result: []int{6, 7, 4, 13, 3},
 	},
 	{
 		name:   "In on data from other index",
-		query:  badgerhold.Where("ID").In(5, 8, 3).Index("Category"),
+		query:  Where("ID").In(5, 8, 3).Index("Category"),
 		result: []int{6, 7, 4, 13, 3},
 	},
 	{
 		name:   "In on index",
-		query:  badgerhold.Where("Category").In("food", "animal").Index("Category"),
+		query:  Where("Category").In("food", "animal").Index("Category"),
 		result: []int{2, 4, 5, 7, 8, 9, 10, 12, 13, 14, 15, 16},
 	},
 	{
 		name:   "Regular Expression",
-		query:  badgerhold.Where("Name").RegExp(regexp.MustCompile("ea")),
+		query:  Where("Name").RegExp(regexp.MustCompile("ea")),
 		result: []int{2, 9, 12},
 	},
 	{
 		name: "Function Field",
-		query: badgerhold.Where("Name").MatchFunc(func(ra *badgerhold.RecordAccess) (bool, error) {
+		query: Where("Name").MatchFunc(func(ra *RecordAccess) (bool, error) {
 			field := ra.Field()
 			_, ok := field.(string)
 			if !ok {
@@ -312,7 +311,7 @@ var testResults = []test{
 	},
 	{
 		name: "Function Record",
-		query: badgerhold.Where("ID").MatchFunc(func(ra *badgerhold.RecordAccess) (bool, error) {
+		query: Where("ID").MatchFunc(func(ra *RecordAccess) (bool, error) {
 			record := ra.Record()
 			_, ok := record.(*ItemTest)
 			if !ok {
@@ -325,7 +324,7 @@ var testResults = []test{
 	},
 	{
 		name: "Function Subquery",
-		query: badgerhold.Where("Name").MatchFunc(func(ra *badgerhold.RecordAccess) (bool, error) {
+		query: Where("Name").MatchFunc(func(ra *RecordAccess) (bool, error) {
 			// find where name exists in more than one category
 			record, ok := ra.Record().(*ItemTest)
 			if !ok {
@@ -335,7 +334,7 @@ var testResults = []test{
 			var result []ItemTest
 
 			err := ra.SubQuery(&result,
-				badgerhold.Where("Name").Eq(record.Name).And("Category").Ne(record.Category))
+				Where("Name").Eq(record.Name).And("Category").Ne(record.Category))
 			if err != nil {
 				return false, err
 			}
@@ -350,38 +349,38 @@ var testResults = []test{
 	},
 	{
 		name:   "Time Comparison",
-		query:  badgerhold.Where("Created").Gt(time.Now()),
+		query:  Where("Created").Gt(time.Now()),
 		result: []int{1, 3, 8, 9, 11},
 	},
 	{
 		name:   "Chained And Query with non-index lead",
-		query:  badgerhold.Where("Created").Gt(time.Now()).And("Category").Eq("vehicle"),
+		query:  Where("Created").Gt(time.Now()).And("Category").Eq("vehicle"),
 		result: []int{1, 3, 11},
 	},
 	{
 		name:   "Multiple Chained And Queries with non-index lead",
-		query:  badgerhold.Where("Created").Gt(time.Now()).And("Category").Eq("vehicle").And("ID").Ge(10),
+		query:  Where("Created").Gt(time.Now()).And("Category").Eq("vehicle").And("ID").Ge(10),
 		result: []int{11},
 	},
 	{
 		name:   "Chained And Query with leading Index", // also different order same criteria
-		query:  badgerhold.Where("Category").Eq("vehicle").And("ID").Ge(10).And("Created").Gt(time.Now()),
+		query:  Where("Category").Eq("vehicle").And("ID").Ge(10).And("Created").Gt(time.Now()),
 		result: []int{11},
 	},
 	{
 		name:   "Chained Or Query with leading index",
-		query:  badgerhold.Where("Category").Eq("vehicle").Or(badgerhold.Where("Category").Eq("animal")),
+		query:  Where("Category").Eq("vehicle").Or(Where("Category").Eq("animal")),
 		result: []int{0, 1, 3, 6, 11, 2, 5, 8, 9, 13, 14, 16},
 	},
 	{
 		name:   "Chained Or Query with unioned data",
-		query:  badgerhold.Where("Category").Eq("animal").Or(badgerhold.Where("Name").Eq("fish")),
+		query:  Where("Category").Eq("animal").Or(Where("Name").Eq("fish")),
 		result: []int{2, 5, 8, 9, 13, 14, 16, 15},
 	},
 	{
 		name: "Multiple Chained And + Or Query ",
-		query: badgerhold.Where("Category").Eq("animal").And("Created").Gt(time.Now()).
-			Or(badgerhold.Where("Name").Eq("fish").And("ID").Ge(13)),
+		query: Where("Category").Eq("animal").And("Created").Gt(time.Now()).
+			Or(Where("Name").Eq("fish").And("ID").Ge(13)),
 		result: []int{8, 9, 15},
 	},
 	{
@@ -391,57 +390,57 @@ var testResults = []test{
 	},
 	{
 		name:   "Nil Comparison",
-		query:  badgerhold.Where("Tags").IsNil(),
+		query:  Where("Tags").IsNil(),
 		result: []int{0, 1, 2, 3, 5, 6, 8, 9, 11, 13, 14, 16},
 	},
 	{
 		name:   "String starts with",
-		query:  badgerhold.Where("Name").HasPrefix("golf"),
+		query:  Where("Name").HasPrefix("golf"),
 		result: []int{11},
 	},
 	{
 		name:   "String ends with",
-		query:  badgerhold.Where("Name").HasSuffix("cart"),
+		query:  Where("Name").HasSuffix("cart"),
 		result: []int{11},
 	},
 	{
 		name:   "Self-Field comparison",
-		query:  badgerhold.Where("Color").Eq(badgerhold.Field("Fruit")).And("Fruit").Ne(""),
+		query:  Where("Color").Eq(Field("Fruit")).And("Fruit").Ne(""),
 		result: []int{6},
 	},
 	{
 		name:   "Test Key in secondary",
-		query:  badgerhold.Where("Category").Eq("food").And(badgerhold.Key).Eq(testData[4].Key),
+		query:  Where("Category").Eq("food").And(Key).Eq(testData[4].Key),
 		result: []int{4},
 	},
 	{
 		name:   "Skip",
-		query:  badgerhold.Where(badgerhold.Key).Gt(testData[10].Key).Skip(3),
+		query:  Where(Key).Gt(testData[10].Key).Skip(3),
 		result: []int{14, 15, 16},
 	},
 	{
 		name:   "Skip Past Len",
-		query:  badgerhold.Where(badgerhold.Key).Gt(testData[10].Key).Skip(9),
+		query:  Where(Key).Gt(testData[10].Key).Skip(9),
 		result: []int{},
 	},
 	{
 		name:   "Skip with Or query",
-		query:  badgerhold.Where("Category").Eq("vehicle").Or(badgerhold.Where("Category").Eq("animal")).Skip(4),
+		query:  Where("Category").Eq("vehicle").Or(Where("Category").Eq("animal")).Skip(4),
 		result: []int{11, 2, 5, 8, 9, 13, 14, 16},
 	},
 	{
 		name:   "Skip with Or query, that crosses or boundary",
-		query:  badgerhold.Where("Category").Eq("vehicle").Or(badgerhold.Where("Category").Eq("animal")).Skip(8),
+		query:  Where("Category").Eq("vehicle").Or(Where("Category").Eq("animal")).Skip(8),
 		result: []int{9, 13, 14, 16},
 	},
 	{
 		name:   "Limit",
-		query:  badgerhold.Where(badgerhold.Key).Gt(testData[10].Key).Limit(5),
+		query:  Where(Key).Gt(testData[10].Key).Limit(5),
 		result: []int{11, 12, 13, 14, 15},
 	},
 	{
 		name: "Issue #8 - Function Field on index",
-		query: badgerhold.Where("Category").MatchFunc(func(ra *badgerhold.RecordAccess) (bool, error) {
+		query: Where("Category").MatchFunc(func(ra *RecordAccess) (bool, error) {
 			field := ra.Field()
 			_, ok := field.(string)
 			if !ok {
@@ -454,7 +453,7 @@ var testResults = []test{
 	},
 	{
 		name: "Issue #8 - Function Field on a specific index",
-		query: badgerhold.Where("Category").MatchFunc(func(ra *badgerhold.RecordAccess) (bool, error) {
+		query: Where("Category").MatchFunc(func(ra *RecordAccess) (bool, error) {
 			field := ra.Field()
 			_, ok := field.(string)
 			if !ok {
@@ -467,8 +466,8 @@ var testResults = []test{
 	},
 	{
 		name: "Find item with max ID in each category - sub aggregate query",
-		query: badgerhold.Where("ID").MatchFunc(func(ra *badgerhold.RecordAccess) (bool, error) {
-			grp, err := ra.SubAggregateQuery(badgerhold.Where("Category").
+		query: Where("ID").MatchFunc(func(ra *RecordAccess) (bool, error) {
+			grp, err := ra.SubAggregateQuery(Where("Category").
 				Eq(ra.Record().(*ItemTest).Category), "Category")
 			if err != nil {
 				return false, err
@@ -483,27 +482,27 @@ var testResults = []test{
 	},
 	{
 		name:   "Indexed in",
-		query:  badgerhold.Where("Category").In("animal", "vehicle"),
+		query:  Where("Category").In("animal", "vehicle"),
 		result: []int{0, 1, 2, 3, 5, 6, 8, 9, 11, 13, 14, 16},
 	},
 	{
 		name:   "Equal Field With Specific Index",
-		query:  badgerhold.Where("Category").Eq("vehicle").Index("Category"),
+		query:  Where("Category").Eq("vehicle").Index("Category"),
 		result: []int{0, 1, 3, 6, 11},
 	},
 	{
 		name:   "Key test after lead field",
-		query:  badgerhold.Where("Category").Eq("food").And(badgerhold.Key).Gt(testData[10].Key),
+		query:  Where("Category").Eq("food").And(Key).Gt(testData[10].Key),
 		result: []int{12, 15},
 	},
 	{
 		name:   "Key test after lead index",
-		query:  badgerhold.Where("Category").Eq("food").Index("Category").And(badgerhold.Key).Gt(testData[10].Key),
+		query:  Where("Category").Eq("food").Index("Category").And(Key).Gt(testData[10].Key),
 		result: []int{12, 15},
 	},
 }
 
-func insertTestData(t *testing.T, store *badgerhold.Store) {
+func insertTestData(t *testing.T, store *Store) {
 	for i := range testData {
 		err := store.Insert(testData[i].Key, testData[i])
 		if err != nil {
@@ -513,7 +512,7 @@ func insertTestData(t *testing.T, store *badgerhold.Store) {
 }
 
 func TestFind(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		for _, tst := range testResults {
 			t.Run(tst.name, func(t *testing.T) {
@@ -555,10 +554,10 @@ func TestFind(t *testing.T) {
 type BadType struct{}
 
 func TestFindOnUnknownType(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		var result []BadType
-		err := store.Find(&result, badgerhold.Where("BadName").Eq("blah"))
+		err := store.Find(&result, Where("BadName").Eq("blah"))
 		if err != nil {
 			t.Fatalf("Error finding data from badgerhold: %s", err)
 		}
@@ -569,30 +568,30 @@ func TestFindOnUnknownType(t *testing.T) {
 }
 
 func TestFindWithNilValue(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 
 		var result []ItemTest
-		err := store.Find(&result, badgerhold.Where("Name").Eq(nil))
+		err := store.Find(&result, Where("Name").Eq(nil))
 		if err == nil {
 			t.Fatalf("Comparing with nil did NOT return an error!")
 		}
 
-		if _, ok := err.(*badgerhold.ErrTypeMismatch); !ok {
+		if _, ok := err.(*ErrTypeMismatch); !ok {
 			t.Fatalf("Comparing with nil did NOT return the correct error.  Got %v", err)
 		}
 	})
 }
 
 func TestFindWithNonSlicePtr(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Fatalf("Running Find with non-slice pointer did not panic!")
 			}
 		}()
 		var result []ItemTest
-		_ = store.Find(result, badgerhold.Where("Name").Eq("blah"))
+		_ = store.Find(result, Where("Name").Eq("blah"))
 	})
 }
 
@@ -603,7 +602,7 @@ func TestQueryWhereNamePanic(t *testing.T) {
 		}
 	}()
 
-	_ = badgerhold.Where("lower").Eq("test")
+	_ = Where("lower").Eq("test")
 }
 
 func TestQueryAndNamePanic(t *testing.T) {
@@ -613,15 +612,15 @@ func TestQueryAndNamePanic(t *testing.T) {
 		}
 	}()
 
-	_ = badgerhold.Where("Upper").Eq("test").And("lower").Eq("test")
+	_ = Where("Upper").Eq("test").And("lower").Eq("test")
 }
 
 func TestFindOnInvalidFieldName(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		var result []ItemTest
 
-		err := store.Find(&result, badgerhold.Where("BadFieldName").Eq("test"))
+		err := store.Find(&result, Where("BadFieldName").Eq("test"))
 		if err == nil {
 			t.Fatalf("Find query against a bad field name didn't return an error!")
 		}
@@ -630,11 +629,11 @@ func TestFindOnInvalidFieldName(t *testing.T) {
 }
 
 func TestFindOnInvalidIndex(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		var result []ItemTest
 
-		err := store.Find(&result, badgerhold.Where("Name").Eq("test").Index("BadIndex"))
+		err := store.Find(&result, Where("Name").Eq("test").Index("BadIndex"))
 		if err == nil {
 			t.Fatalf("Find query against a bad index name didn't return an error!")
 		}
@@ -643,11 +642,11 @@ func TestFindOnInvalidIndex(t *testing.T) {
 }
 
 func TestFindOnEmptyBucketWithIndex(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		// DO NOT INSERT DATA
 		var result []ItemTest
 
-		err := store.Find(&result, badgerhold.Where("Category").Eq("animal").Index("Category"))
+		err := store.Find(&result, Where("Category").Eq("animal").Index("Category"))
 		if err != nil {
 			t.Fatalf("Find query against a valid index name but an empty data bucket return an error!: %s",
 				err)
@@ -659,11 +658,11 @@ func TestFindOnEmptyBucketWithIndex(t *testing.T) {
 }
 
 func TestQueryStringPrint(t *testing.T) {
-	q := badgerhold.Where("FirstField").Eq("first value").And("SecondField").Gt("Second Value").And("ThirdField").
+	q := Where("FirstField").Eq("first value").And("SecondField").Gt("Second Value").And("ThirdField").
 		Lt("Third Value").And("FourthField").Ge("FourthValue").And("FifthField").Le("FifthValue").And("SixthField").
-		Ne("Sixth Value").Or(badgerhold.Where("FirstField").In("val1", "val2", "val3").And("SecondField").IsNil().
+		Ne("Sixth Value").Or(Where("FirstField").In("val1", "val2", "val3").And("SecondField").IsNil().
 		And("ThirdField").RegExp(regexp.MustCompile("test")).Index("IndexName").And("FirstField").
-		MatchFunc(func(ra *badgerhold.RecordAccess) (bool, error) {
+		MatchFunc(func(ra *RecordAccess) (bool, error) {
 			return true, nil
 		})).And("SeventhField").HasPrefix("SeventhValue").And("EighthField").HasSuffix("EighthValue")
 
@@ -707,11 +706,11 @@ func TestQueryStringPrint(t *testing.T) {
 }
 
 func TestSkip(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		insertTestData(t, store)
 		var result []ItemTest
 
-		q := badgerhold.Where("Category").Eq("animal").Or(badgerhold.Where("Name").Eq("fish"))
+		q := Where("Category").Eq("animal").Or(Where("Name").Eq("fish"))
 
 		err := store.Find(&result, q)
 
@@ -758,7 +757,7 @@ func TestSkip(t *testing.T) {
 }
 
 func TestSkipNegative(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Fatalf("Running Find with negative skip did not panic!")
@@ -766,12 +765,12 @@ func TestSkipNegative(t *testing.T) {
 		}()
 
 		var result []ItemTest
-		_ = store.Find(&result, badgerhold.Where("Name").Eq("blah").Skip(-30))
+		_ = store.Find(&result, Where("Name").Eq("blah").Skip(-30))
 	})
 }
 
 func TestLimitNegative(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Fatalf("Running Find with negative limit did not panic!")
@@ -779,12 +778,12 @@ func TestLimitNegative(t *testing.T) {
 		}()
 
 		var result []ItemTest
-		_ = store.Find(&result, badgerhold.Where("Name").Eq("blah").Limit(-30))
+		_ = store.Find(&result, Where("Name").Eq("blah").Limit(-30))
 	})
 }
 
 func TestSkipDouble(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Fatalf("Running Find with double skips did not panic!")
@@ -792,12 +791,12 @@ func TestSkipDouble(t *testing.T) {
 		}()
 
 		var result []ItemTest
-		_ = store.Find(&result, badgerhold.Where("Name").Eq("blah").Skip(30).Skip(3))
+		_ = store.Find(&result, Where("Name").Eq("blah").Skip(30).Skip(3))
 	})
 }
 
 func TestLimitDouble(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Fatalf("Running Find with double limits did not panic!")
@@ -805,12 +804,12 @@ func TestLimitDouble(t *testing.T) {
 		}()
 
 		var result []ItemTest
-		_ = store.Find(&result, badgerhold.Where("Name").Eq("blah").Limit(30).Limit(3))
+		_ = store.Find(&result, Where("Name").Eq("blah").Limit(30).Limit(3))
 	})
 }
 
 func TestSkipInOr(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Fatalf("Running Find with skip in or query did not panic!")
@@ -818,12 +817,12 @@ func TestSkipInOr(t *testing.T) {
 		}()
 
 		var result []ItemTest
-		_ = store.Find(&result, badgerhold.Where("Name").Eq("blah").Or(badgerhold.Where("Name").Eq("blah").Skip(3)))
+		_ = store.Find(&result, Where("Name").Eq("blah").Or(Where("Name").Eq("blah").Skip(3)))
 	})
 }
 
 func TestLimitInOr(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Fatalf("Running Find with limit in or query did not panic!")
@@ -831,12 +830,12 @@ func TestLimitInOr(t *testing.T) {
 		}()
 
 		var result []ItemTest
-		_ = store.Find(&result, badgerhold.Where("Name").Eq("blah").Or(badgerhold.Where("Name").Eq("blah").Limit(3)))
+		_ = store.Find(&result, Where("Name").Eq("blah").Or(Where("Name").Eq("blah").Limit(3)))
 	})
 }
 
 func TestSlicePointerResult(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		count := 10
 		for i := 0; i < count; i++ {
 			err := store.Insert(i, &ItemTest{
@@ -862,7 +861,7 @@ func TestSlicePointerResult(t *testing.T) {
 }
 
 func TestKeyMatchFunc(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Fatalf("Running matchFunc against Key query did not panic!")
@@ -870,7 +869,7 @@ func TestKeyMatchFunc(t *testing.T) {
 		}()
 
 		var result []ItemTest
-		_ = store.Find(&result, badgerhold.Where(badgerhold.Key).MatchFunc(func(ra *badgerhold.RecordAccess) (bool, error) {
+		_ = store.Find(&result, Where(Key).MatchFunc(func(ra *RecordAccess) (bool, error) {
 			field := ra.Field()
 			_, ok := field.(string)
 			if !ok {
@@ -883,7 +882,7 @@ func TestKeyMatchFunc(t *testing.T) {
 }
 
 func TestKeyStructTag(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		type KeyTest struct {
 			Key   int `badgerholdKey:"Key"`
 			Value string
@@ -901,7 +900,7 @@ func TestKeyStructTag(t *testing.T) {
 
 		var result []KeyTest
 
-		err = store.Find(&result, badgerhold.Where(badgerhold.Key).Eq(key))
+		err = store.Find(&result, Where(Key).Eq(key))
 		if err != nil {
 			t.Fatalf("Error running Find in TestKeyStructTag. ERROR: %s", err)
 		}
@@ -914,7 +913,7 @@ func TestKeyStructTag(t *testing.T) {
 }
 
 func TestKeyStructTagIntoPtr(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		type KeyTest struct {
 			Key   *int `badgerholdKey:"Key"`
 			Value string
@@ -932,7 +931,7 @@ func TestKeyStructTagIntoPtr(t *testing.T) {
 
 		var result []KeyTest
 
-		err = store.Find(&result, badgerhold.Where(badgerhold.Key).Eq(key))
+		err = store.Find(&result, Where(Key).Eq(key))
 		if err != nil {
 			t.Fatalf("Error running Find in TestKeyStructTag. ERROR: %s", err)
 		}
@@ -951,13 +950,13 @@ func TestQueryNestedIndex(t *testing.T) {
 		}
 	}()
 
-	_ = badgerhold.Where("Test").Eq("test").Index("Nested.Name")
+	_ = Where("Test").Eq("test").Index("Nested.Name")
 }
 
 // TestQueryIterKeyCacheOverflow tests to make sure that a query can goe past the current hardcoded key cache in the
 // iterator (currently 100 keys)
 func TestQueryIterKeyCacheOverflow(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 
 		type KeyCacheTest struct {
 			Key      int
@@ -977,12 +976,12 @@ func TestQueryIterKeyCacheOverflow(t *testing.T) {
 			}
 		}
 
-		tests := []*badgerhold.Query{
-			badgerhold.Where(badgerhold.Key).Gt(stop),
-			badgerhold.Where(badgerhold.Key).Gt(stop).Index(badgerhold.Key),
-			badgerhold.Where("Key").Gt(stop),
-			badgerhold.Where("IndexKey").Gt(stop).Index("IndexKey"),
-			badgerhold.Where("IndexKey").MatchFunc(func(ra *badgerhold.RecordAccess) (bool, error) {
+		tests := []*Query{
+			Where(Key).Gt(stop),
+			Where(Key).Gt(stop).Index(Key),
+			Where("Key").Gt(stop),
+			Where("IndexKey").Gt(stop).Index("IndexKey"),
+			Where("IndexKey").MatchFunc(func(ra *RecordAccess) (bool, error) {
 				field := ra.Field()
 				_, ok := field.(int)
 				if !ok {
@@ -1024,7 +1023,7 @@ func TestNestedStructPointer(t *testing.T) {
 		Notifications *notification
 	}
 
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		id := "1"
 		store.Insert(id, &device{
 			ID: id,
@@ -1064,7 +1063,7 @@ func TestNestedStructPointer(t *testing.T) {
 }
 
 func TestGetKeyStructTag(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		type KeyTest struct {
 			Key   int `badgerholdKey:"Key"`
 			Value string
@@ -1094,7 +1093,7 @@ func TestGetKeyStructTag(t *testing.T) {
 }
 
 func TestGetKeyStructTagIntoPtr(t *testing.T) {
-	testWrap(t, func(store *badgerhold.Store, t *testing.T) {
+	testWrap(t, func(store *Store, t *testing.T) {
 		type KeyTest struct {
 			Key   *int `badgerholdKey:"Key"`
 			Value string

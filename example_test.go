@@ -2,7 +2,7 @@
 // Use of this source code is governed by the MIT license
 // that can be found in the LICENSE file.
 
-package badgerhold_test
+package badgerhold
 
 import (
 	"fmt"
@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/dgraph-io/badger/v2"
-	"github.com/jmcarbo/badgerhold"
 )
 
 type Item struct {
@@ -47,10 +46,10 @@ func Example() {
 	dir := tempdir()
 	defer os.RemoveAll(dir)
 
-	options := badgerhold.DefaultOptions
+	options := DefaultOptions
 	options.Dir = dir
 	options.ValueDir = dir
-	store, err := badgerhold.Open(options)
+	store, err := Open(options)
 	defer store.Close()
 
 	if err != nil {
@@ -78,7 +77,7 @@ func Example() {
 	// Find all items in the blue category that have been created in the past hour
 	var result []Item
 
-	err = store.Find(&result, badgerhold.Where("Category").Eq("blue").And("Created").Ge(time.Now().Add(-1*time.Hour)))
+	err = store.Find(&result, Where("Category").Eq("blue").And("Created").Ge(time.Now().Add(-1*time.Hour)))
 
 	if err != nil {
 		// handle error
