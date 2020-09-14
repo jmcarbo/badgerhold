@@ -10,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/dgraph-io/badger/v2º"
+	"github.com/dgraph-io/badger/v2"
 	"github.com/jmcarbo/badgerhold"
 )
 
