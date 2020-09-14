@@ -1,4 +1,4 @@
-module badgerhold/v2
+module github.com/jmcarbo/badgerhold/v2
 
 go 1.15
 
